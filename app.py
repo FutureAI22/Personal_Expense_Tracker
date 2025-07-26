@@ -175,19 +175,6 @@ def main():
     elif menu_selection == "Save Data":
         st.header("Save Expense Data")
 
-        # Option 1: Save to server (for app persistence)
-        st.subheader("Save to App's Storage")
-        st.write("Click the button below to save your current expenses to the app's internal CSV file.")
-        if st.button("Save Expenses to App"):
-            # Filter out invalid expenses before saving to ensure data integrity
-            valid_expenses_to_save = [exp for exp in st.session_state.expenses if validate_expense(exp)[0]]
-            save_expenses(valid_expenses_to_save)
-            st.success(f"Expenses saved to `{EXPENSE_FILE}` successfully on the server!")
-            if len(st.session_state.expenses) != len(valid_expenses_to_save):
-                st.warning(f"Note: {len(st.session_state.expenses) - len(valid_expenses_to_save)} invalid/incomplete entries were not saved to the server.")
-
-        st.markdown("---") # Separator
-
         # Option 2: Download to local machine (user chooses location)
         st.subheader("Download to Your Computer")
         st.write("Generate a CSV file of your expenses and download it to your local machine.")
