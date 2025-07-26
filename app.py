@@ -67,10 +67,9 @@ def main():
 
     st.title("💰 Personal Expense Tracker")
 
-    # Sidebar for navigation
-    st.sidebar.header("Navigation")
-    menu_selection = st.sidebar.radio(
-        "Go to",
+    # Dropdown menu for navigation on the main page
+    menu_selection = st.selectbox(
+        "Choose an action:",
         ("Add Expense", "View Expenses", "Track Budget", "Save Data")
     )
 
@@ -106,7 +105,6 @@ def main():
         st.header("View All Expenses")
         if st.session_state.expenses:
             # Filter out invalid entries for display, but keep them in session_state for now
-            # For a production app, you might want to handle invalid entries differently (e.g., allow editing)
             valid_expenses_for_display = []
             for exp in st.session_state.expenses:
                 is_valid, _ = validate_expense(exp)
