@@ -67,9 +67,10 @@ def main():
 
     st.title("💰 Personal Expense Tracker")
 
-    # Dropdown menu for navigation on the main page
-    menu_selection = st.selectbox(
-        "Choose an action:",
+    # Sidebar for navigation with a dropdown menu
+    st.sidebar.header("Navigation")
+    menu_selection = st.sidebar.selectbox(
+        "Go to",
         ("Add Expense", "View Expenses", "Track Budget", "Save Data")
     )
 
