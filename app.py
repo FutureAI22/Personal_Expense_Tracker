@@ -26,7 +26,7 @@ def load_expenses():
         return []
 
 def save_expenses(expenses):
-    """Saves expenses to a CSV file."""
+    """Saves expenses to a CSV file on the server (for app persistence)."""
     if not expenses:
         # If no expenses, create an empty DataFrame with headers
         df = pd.DataFrame(columns=['Date', 'Category', 'Amount', 'Description'])
@@ -37,7 +37,7 @@ def save_expenses(expenses):
     try:
         df.to_csv(EXPENSE_FILE, index=False)
     except Exception as e:
-        st.error(f"Error saving expenses: {e}")
+        st.error(f"Error saving expenses to server: {e}")
 
 def validate_expense(expense):
     """Validates an expense entry."""
@@ -174,14 +174,41 @@ def main():
     # --- Save Data Section ---
     elif menu_selection == "Save Data":
         st.header("Save Expense Data")
-        st.write("Click the button below to save your current expenses to a CSV file.")
-        if st.button("Save Expenses Now"):
+
+        # Option 1: Save to server (for app persistence)
+        st.subheader("Save to App's Storage")
+        st.write("Click the button below to save your current expenses to the app's internal CSV file.")
+        if st.button("Save Expenses to App"):
             # Filter out invalid expenses before saving to ensure data integrity
             valid_expenses_to_save = [exp for exp in st.session_state.expenses if validate_expense(exp)[0]]
             save_expenses(valid_expenses_to_save)
-            st.success(f"Expenses saved to `{EXPENSE_FILE}` successfully!")
+            st.success(f"Expenses saved to `{EXPENSE_FILE}` successfully on the server!")
             if len(st.session_state.expenses) != len(valid_expenses_to_save):
-                st.warning(f"Note: {len(st.session_state.expenses) - len(valid_expenses_to_save)} invalid/incomplete entries were not saved.")
+                st.warning(f"Note: {len(st.session_state.expenses) - len(valid_expenses_to_save)} invalid/incomplete entries were not saved to the server.")
+
+        st.markdown("---") # Separator
+
+        # Option 2: Download to local machine (user chooses location)
+        st.subheader("Download to Your Computer")
+        st.write("Generate a CSV file of your expenses and download it to your local machine.")
+
+        # Get valid expenses for download
+        valid_expenses_for_download = [exp for exp in st.session_state.expenses if validate_expense(exp)[0]]
+        if valid_expenses_for_download:
+            df_download = pd.DataFrame(valid_expenses_for_download)
+            csv_data = df_download.to_csv(index=False).encode('utf-8')
+            download_filename = st.text_input("Enter desired filename (e.g., my_expenses.csv)", value="my_expenses.csv")
+
+            st.download_button(
+                label="Download Expenses CSV",
+                data=csv_data,
+                file_name=download_filename,
+                mime="text/csv",
+                help="Click to download your expenses as a CSV file to your computer."
+            )
+        else:
+            st.info("No valid expenses to download yet.")
+
 
     # --- Initial load message (Optional, for first run) ---
     if not st.session_state.expenses and menu_selection != "Add Expense":
